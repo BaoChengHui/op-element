@@ -1,9 +1,8 @@
-import type { App } from "vue";
-import Components from "./component";
+import type { App } from 'vue'
+import Components from './component'
 
-
-export const install = (app:App)=>{
-    Components.forEach(item=>{
-        app.use(item)
-    })
+export function install(app: App) {
+  Components.forEach((item) => {
+    app.use(item)
+  })
 }

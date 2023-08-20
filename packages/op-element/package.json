@@ -15,7 +15,11 @@
     "vue-tsc": "^1.8.6",
     "vite-plugin-dts":"^3.5.2",
     "element-plus":"^2.3.9",
-    "unplugin-vue-components":"^0.25.1"
+    "unplugin-vue-components":"^0.25.1",
+    "unplugin-vue-macros":"^2.4.7",
+    "@vue-macros/volar":"^0.13.4",
+    "lodash-es":"^4.17.21",
+    "@types/lodash-es":"^4.17.8"
   },
   "scripts": {
     "build": "vite build"

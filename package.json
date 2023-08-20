@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "element-puls",
   "main": "index.js",
-  "scripts": {
-    
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.40.2",
+    "eslint": "^8.47.0"
+  }
 }
