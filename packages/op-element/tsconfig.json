@@ -1,0 +1,13 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": [ "src/**/*", "src/**/*.vue","src/**/*.ts","src/**/*.scss"],
+  "exclude": ["src/**/__tests__/*"],
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["element-plus/global"],
+    "moduleResolution": "node"
+  }
+}

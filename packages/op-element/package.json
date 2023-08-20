@@ -1,0 +1,26 @@
+{
+  "name": "op-element",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "@vue/tsconfig":"^0.4.0",
+    "vue":"^3.3.4",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "vite": "^4.4.6",
+    "vue-tsc": "^1.8.6",
+    "vite-plugin-dts":"^3.5.2",
+    "element-plus":"^2.3.9",
+    "unplugin-vue-components":"^0.25.1"
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
