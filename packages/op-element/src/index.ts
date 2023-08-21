@@ -1,6 +1,6 @@
-import { install } from "./install"
+import { install } from './install'
 
 export * from './op-table'
-export * from "./utils"
+export * from './utils'
 
 export default install
