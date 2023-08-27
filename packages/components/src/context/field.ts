@@ -1,5 +1,5 @@
 import type { InjectionKey, Ref } from 'vue'
-import type { RecordAble } from '../types'
+import type { ElColProps, RecordAble } from '../types'
 
 export const formFieldKey = Symbol('FormField') as InjectionKey<{
   model: Ref<RecordAble>
@@ -10,4 +10,8 @@ export const formFieldKey = Symbol('FormField') as InjectionKey<{
 
 export const arrayFieldKey = Symbol('ArrayFieldKey') as InjectionKey<{
   prop: string
+}>
+
+export const formLayoutKey = Symbol('FormLayoutKey') as InjectionKey<{
+  layout: number | ElColProps
 }>

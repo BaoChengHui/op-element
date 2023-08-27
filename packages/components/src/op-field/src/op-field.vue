@@ -1,11 +1,11 @@
 <script lang="tsx" setup>
-import { ElFormItem, type FormItemRule } from 'element-plus'
+import { ElCol, ElFormItem, type FormItemRule } from 'element-plus'
 import { computed, h, ref, watch } from 'vue'
-import { get, isEqual } from 'lodash-es'
+import { get, isEqual, isNumber } from 'lodash-es'
 import { useParent } from '../../use'
-import { arrayFieldKey, formFieldKey } from '../../context'
+import { arrayFieldKey, formFieldKey, formLayoutKey } from '../../context'
 import { getArrDestructorKeys, getObjDestructorkeys, isArray, isEmpty, isPlainObject } from '../../utils'
-import type { FieldCompoent } from './op-field.type'
+import type { FieldCompoent, FieldLayout } from './op-field.type'
 import { fieldConfigMap } from './map'
 
 defineOptions({
@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<{
   rules?: FormItemRule[]
   label?: string
   defaultValue?: unknown
+  layout?: FieldLayout
 }>(), {
   component: () => {
     return {
@@ -29,38 +30,11 @@ const props = withDefaults(defineProps<{
   rules() {
     return []
   },
+  layout: true,
 })
 
 const formItemProps = computed(() => {
   const { required, label, rules, prop } = props
-  // const res = getIndexAndName()
-  // const newProps = []
-  // // 处理formItem prop 获取正确的表单校验
-  // if (res) {
-  //   const { indexOfArrFiled, nameWithoutIndex } = res
-  //   if (parentArrayField?.prop) {
-  //     newProps.push(parentArrayField.prop)
-  //   }
-  //   if (indexOfArrFiled) {
-  //     newProps.push(indexOfArrFiled)
-  //   }
-  //   if (arrNames && arrNames[0]) {
-  //     newProps.push(arrNames[0])
-  //   }
-  //   else if (objNames && objNames[0]) {
-  //     const [originKey, targetKey] = objNames[0].split(':')
-  //     if (targetKey) {
-  //       newProps.push(targetKey)
-  //     }
-  //     else {
-  //       newProps.push(originKey)
-  //     }
-  //   }
-  //   else {
-  //     newProps.push(nameWithoutIndex)
-  //   }
-  // }
-
   if (required) {
     rules.push({
       required: true,
@@ -90,6 +64,15 @@ const target = computed(() => {
 const modelValue = ref()
 const { parent: parentForm } = useParent(formFieldKey)
 const { parent: parentArrayField } = useParent(arrayFieldKey)
+const arrNames = getArrDestructorKeys(props.prop)
+const objNames = getObjDestructorkeys(props.prop)
+
+const initDefault = () => {
+  if (!isEmpty(props.defaultValue)) {
+    modelValue.value = props.defaultValue
+    updateValue(props.defaultValue)
+  }
+}
 
 const getIndexAndName = () => {
   if (props.prop) {
@@ -114,9 +97,6 @@ const getIndexAndName = () => {
 const parentModelAble = () => {
   return !!(parentForm && props.prop)
 }
-
-const arrNames = getArrDestructorKeys(props.prop)
-const objNames = getObjDestructorkeys(props.prop)
 
 const updateValue = (val: unknown) => {
   if (parentModelAble()) {
@@ -171,11 +151,6 @@ const updateValue = (val: unknown) => {
       parentForm!.updateModel(path, val)
     }
   }
-}
-
-if (!isEmpty(props.defaultValue)) {
-  modelValue.value = props.defaultValue
-  updateValue(props.defaultValue)
 }
 
 const initWatchFromModel = () => {
@@ -253,7 +228,41 @@ const initWatchFromModel = () => {
   }
 }
 
+initDefault()
 initWatchFromModel()
+
+const { parent: parentLayout } = useParent(formLayoutKey)
+
+const useLayout = computed(() => {
+  return !!(parentLayout?.layout && props.layout)
+})
+
+const innerLayout = computed(() => {
+  const { layout } = props
+  if (isNumber(layout)) {
+    return {
+      span: layout,
+    }
+  }
+  if (isPlainObject(layout)) {
+    return layout
+  }
+  const { layout: pLayout } = parentLayout || {}
+
+  if (isNumber(pLayout)) {
+    return {
+      span: pLayout,
+    }
+  }
+  if (isPlainObject(pLayout)) {
+    return pLayout
+  }
+  return {}
+})
+
+const renderItem = () => {
+  return <ElFormItem {...formItemProps.value} >{renderComponent()}</ElFormItem>
+}
 
 function renderComponent() {
   return h(target.value.TargetComponent, {
@@ -264,6 +273,6 @@ function renderComponent() {
 }
 
 defineRender(() => {
-  return <ElFormItem {...formItemProps.value} >{renderComponent()}</ElFormItem>
+  return useLayout.value ? <ElCol {...innerLayout.value}>{renderItem()}</ElCol> : renderItem()
 })
 </script>

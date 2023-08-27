@@ -5,6 +5,7 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
+    "rootDir": "src",
     "types": ["element-plus/global","unplugin-vue-macros/macros-global"],
     "moduleResolution": "node"
   }

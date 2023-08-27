@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     App: typeof import('./../src/components/App.vue')['default']
+    copy: typeof import('./../src/components/App copy.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElInput: typeof import('element-plus/es')['ElInput']
@@ -15,6 +16,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTag: typeof import('element-plus/es')['ElTag']
+    Form: typeof import('./../src/components/form.vue')['default']
     HelloWorld: typeof import('./../src/components/HelloWorld.vue')['default']
     IconCommunity: typeof import('./../src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./../src/components/icons/IconDocumentation.vue')['default']

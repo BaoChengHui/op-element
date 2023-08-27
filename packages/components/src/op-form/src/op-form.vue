@@ -4,12 +4,13 @@ import { ElForm } from 'element-plus'
 import { computed, ref } from 'vue'
 import { get, isEqual, omit, set } from 'lodash-es'
 import type { Ref } from 'vue'
-import { OpField } from '../../op-field'
-import { booleanAbleExecuter } from '../../utils'
+import { type FieldLayout, OpField } from '../../op-field'
+import { booleanAbleExecuter, isBoolean } from '../../utils'
 import { useChildren } from '../../use'
 import { formFieldKey } from '../../context'
 import type { RecordAble } from '../../types'
-import type { OpFields } from './op-from.type'
+import { OpFormLayout } from '../../op-form-layout'
+import type { OpFields } from './op-form.type'
 
 defineOptions({
   name: 'OpForm',
@@ -18,11 +19,13 @@ defineOptions({
 const props = withDefaults(defineProps<{
   labelSuffix?: string
   fields?: OpFields
+  layout?: FieldLayout
 }>(), {
   labelSuffix: ':',
   fields() {
     return []
   },
+  layout: false,
 })
 const visibleFields = computed(() => {
   const { fields } = props
@@ -50,6 +53,10 @@ linkChildren({ model: modelValue, updateModel, updateValidModel, validModel })
 
 const formRef = ref() as Ref<FormInstance>
 
+const bindLyaout = computed(() => {
+  return isBoolean(props.layout) ? undefined : props.layout
+})
+
 defineExpose({
   validate: computed(() => formRef.value.validate),
   validateField: computed(() => formRef.value.validateField),
@@ -62,7 +69,12 @@ defineExpose({
 <template>
   <ElForm ref="formRef" :label-suffix="labelSuffix" :model="validModel">
     <slot>
-      <OpField v-for="(field, index) in visibleFields" :key="`${index}-${field.prop}`" v-bind="field" />
+      <OpFormLayout v-if="layout" :layout="bindLyaout">
+        <OpField v-for="(field, index) in visibleFields" :key="`${index}-${field.prop}`" v-bind="field" />
+      </OpFormLayout>
+      <template v-else>
+        <OpField v-for="(field, index) in visibleFields" :key="`${index}-${field.prop}`" v-bind="field" />
+      </template>
     </slot>
   </ElForm>
 </template>
