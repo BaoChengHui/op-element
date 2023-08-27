@@ -72,6 +72,9 @@ const initDefault = () => {
     modelValue.value = props.defaultValue
     updateValue(props.defaultValue)
   }
+  else {
+    updateValue(null)
+  }
 }
 
 const getIndexAndName = () => {

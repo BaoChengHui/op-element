@@ -1,14 +1,30 @@
-import type { BooleanAble } from '../types'
-import { isBoolean, isFunction, isString } from './is'
+import type { BooleanAble, Promisable } from '../types'
+import { isBoolean, isFunction, isPromise, isString } from './is'
 
 export const booleanAbleExecuter = (it: BooleanAble, ...arg: any[]): boolean => {
   if (isBoolean(it)) {
     return it
   }
   if (isFunction(it)) {
-    return it(arg)
+    return it(...arg)
   }
   return false
+}
+
+export const promiseAbelExcuter = <T>(it: (...arg: any) => Promisable<T>, ...arg: any[]): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    const r = it(...arg)
+    if (isPromise(r)) {
+      r.then((res) => {
+        resolve(res)
+      }).catch((err) => {
+        reject(err)
+      })
+    }
+    else {
+      resolve(r)
+    }
+  })
 }
 
 const reg = /^(\d+\.)?\[(.*)\]$/ // like [startTime,endTime] or 1.[startTime,endTime]
