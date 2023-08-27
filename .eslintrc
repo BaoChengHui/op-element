@@ -2,6 +2,10 @@
     "root": true,
     "extends":"@antfu",
     "rules": {
-        //
+        "antfu/top-level-function":"off",
+        "@typescript-eslint/ban-types":"off",
+        "curly":"off",
+        "unused-imports/no-unused-imports":"off",
+        "@typescript-eslint/no-use-before-define":"off"
     }
 }
