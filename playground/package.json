@@ -12,7 +12,7 @@
   "dependencies": {
     "vue": "^3.3.4",
     "element-plus":"^2.3.9",
-    "op-element":"workspace*",
+    "components":"workspace*",
     "normalize.css":"^8.0.1",
     "lodash-es":"^4.17.21"
   },
