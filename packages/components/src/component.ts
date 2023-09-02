@@ -5,6 +5,7 @@ import { OpSelect } from './op-select'
 import { OpForm } from './op-form'
 import { OpArrayField } from './op-array-field'
 import { OpFormLayout } from './op-form-layout'
+import { OpDialog } from './op-dialog'
 
 export default [
   OpTable,
@@ -13,4 +14,5 @@ export default [
   OpForm,
   OpArrayField,
   OpFormLayout,
+  OpDialog,
 ] as Plugin[]

@@ -18,25 +18,25 @@ const { config, handlerSubmit, submitLoading, resetFields } = useOpForm<{
   phone: string
   address: string
 }>({
-  // fields: [
-  //   { label: '姓名', prop: 'name', required: true, defaultValue: '5555' },
-  //   { label: '手机', prop: 'phone', required: true, defaultValue: '5555' },
-  //   {
-  //     label: '地址',
-  //     prop: 'address',
-  //     defaultValue: '5555',
-  //   },
-  // ],
+  fields: [
+    { label: '姓名', prop: 'name', required: true, defaultValue: '5555' },
+    { label: '手机', prop: 'phone', required: true, defaultValue: '5555' },
+    {
+      label: '地址',
+      prop: 'address',
+      defaultValue: '5555',
+    },
+  ],
+  formProps: {
+    layout: 8,
+    inline: true,
+  },
 })
 </script>
 
 <template>
   <div style="padding: 16px;">
-    <OpForm v-bind="config">
-      <OpField label="姓名" prop="name" default-value="2222" />
-      <OpField label="手机" prop="phone" />
-      <OpField label="地址" prop="address" />
-    </OpForm>
+    <OpForm v-bind="config" />
     <ElButton @click="resetFields()">
       重置表单
     </ElButton>
