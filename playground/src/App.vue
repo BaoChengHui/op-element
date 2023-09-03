@@ -1,12 +1,12 @@
 <script setup lang="tsx">
-import { useFormDialog } from 'components'
+import { FormDialog, useFormDialog } from 'components'
 import { reactive, ref } from 'vue'
 
 const { config, callCreate, callModify } = useFormDialog<{
   name: string
   address: string
 }>({
-  title: '个人信息',
+  title: '个人信息模板',
   fields: [
     { label: '姓名', prop: 'name', required: true },
     { label: '地址', prop: 'address', required: true },
@@ -19,23 +19,66 @@ const { config, callCreate, callModify } = useFormDialog<{
   },
 })
 
+const formDialog = FormDialog<{
+  name: string
+  address: string
+}>({
+  title: '个人信息',
+  fields: [
+    { label: '姓名', prop: 'name', required: true },
+    { label: '地址', prop: 'address', required: true },
+  ],
+  onSubmit(params) {
+    console.log('params', params)
+  },
+  destroyOnClosed: true,
+})
+
 const handlerModify = () => {
-  callModify({
-    name: '1111',
-    address: '2222',
-    other: '222',
+  formDialog.modify({ name: '111', address: '222' }).then(() => {
+  }).catch(() => {
   })
 }
+
+const handlerOpen = () => {
+  /// callCreate()
+  formDialog.create().then(() => {
+  }).catch(() => {
+  })
+}
+
+const formDialog2 = FormDialog<{
+  name: string
+  address: string
+}>({
+  title: '个人信息2',
+  fields: [
+    { label: '姓名2', prop: 'name', required: true },
+    { label: '地址2', prop: 'address', required: true },
+  ],
+})
+
+const handlerOpen2 = () => {
+  formDialog2.create()
+}
+
+// formDialog.callCreate()
 </script>
 
 <template>
   <div style="padding: 16px;">
     <OpFormDialog v-bind="config" />
     <ElButton @click="callCreate">
+      打开模板弹窗
+    </ElButton>
+    <ElButton @click="handlerOpen">
       打开
     </ElButton>
     <ElButton @click="handlerModify">
       修改
+    </ElButton>
+    <ElButton @click="handlerOpen2">
+      打开弹窗2
     </ElButton>
   </div>
 </template>

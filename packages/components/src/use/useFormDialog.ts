@@ -7,6 +7,7 @@ import { isEmpty, promiseAbelExcuter } from '../utils'
 
 export type UseFormDialogOptions<T, P extends T = T & Recordable> = OpFormDialogProps & {
   fields?: MaybeRef<OpFields>
+  title?: string
   fullTitle?: string
   modelKeys?: Arrayable<string>
   assignAll?: boolean
@@ -28,7 +29,6 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
     onModify,
     onSubmit,
     beforeSubmit,
-    onSuccess,
     onOpen,
     ...others
   } = options
@@ -72,7 +72,7 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
       }
       loading.value = true
       await promiseAbelExcuter(fn, submitData)
-      onSuccess?.()
+      options.onSuccess?.()
       visible.value = false
     }
     catch (error) {
@@ -91,7 +91,7 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
     return {
       'modelValue': visible.value,
       'onUpdate:modelValue': val => visible.value = val,
-      'title': fullTitle ?? (isModify.value ? `新增${title}` : `编辑${title}`),
+      'title': fullTitle ?? (isModify.value ? `编辑${title}` : `新增${title}`),
       'model': model.value,
       'onUpdate:model': (val: Recordable) => {
         model.value = val
@@ -132,7 +132,7 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
     setState(false)
   }
 
-  const callModify = (data: P) => {
+  const callModify = (data: Partial<P>) => {
     modifyData = data
     setState(true)
   }
