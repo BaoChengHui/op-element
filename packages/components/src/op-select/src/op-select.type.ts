@@ -1,7 +1,7 @@
-import type { PickComponentProps, RecordAble } from '../../types'
+import type { PickComponentProps, Recordable } from '../../types'
 import type opSelect from './op-select.vue'
 
-export type OpSelectValueAble = string | number | RecordAble | OpSelectValueAble[]
+export type OpSelectValueAble = string | number | Recordable | OpSelectValueAble[]
 
 export interface OpSelectOption {
   label: string

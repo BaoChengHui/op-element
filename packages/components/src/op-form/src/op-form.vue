@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus'
 import { ElForm } from 'element-plus'
-import { computed, ref } from 'vue'
-import { get, isEqual, omit, set } from 'lodash-es'
+import { computed, nextTick, ref, toRaw, watch } from 'vue'
+import { cloneDeep, get, isEmpty, isEqual, omit, set } from 'lodash-es'
 import type { Ref } from 'vue'
 import { type FieldLayout, OpField } from '../../op-field'
 import { booleanAbleExecuter, isBoolean } from '../../utils'
 import { useChildren } from '../../use'
 import { formFieldKey } from '../../context'
-import type { RecordAble } from '../../types'
+import type { Recordable } from '../../types'
 import { OpFormLayout } from '../../op-form-layout'
 import type { OpFields } from './op-form.type'
 
@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<{
   labelSuffix?: string
   fields?: OpFields
   layout?: FieldLayout
+  modelValue?: Recordable
 }>(), {
   labelSuffix: ':',
   fields() {
@@ -27,6 +28,28 @@ const props = withDefaults(defineProps<{
   },
   layout: false,
 })
+const emit = defineEmits(['update:modelValue'])
+
+const innerModel = ref<Recordable>({})
+const model = computed({
+  get: () => {
+    if (props.modelValue) {
+      return props.modelValue
+    }
+    else {
+      return innerModel.value
+    }
+  },
+  set: (val) => {
+    if (props.modelValue) {
+      innerModel.value = val
+    }
+    else {
+      emit('update:modelValue', val)
+    }
+  },
+})
+
 const visibleFields = computed(() => {
   const { fields } = props
   return fields.filter(({ visible = true }) => {
@@ -36,23 +59,39 @@ const visibleFields = computed(() => {
     return field
   })
 })
-const modelValue = defineModel<RecordAble>({ default: {} })
+
+let initModel = {}
+
 const updateModel = (path: string, val: unknown) => {
-  if (!isEqual(get(modelValue.value, path), val)) {
-    set(modelValue.value, path, val)
+  if (isEqual(get(initModel, path), val) && !isEmpty(initModel)) {
+    nextTick(() => {
+      set(model.value, path, val)
+    })
+  }
+  else {
+    set(model.value, path, val)
   }
 }
+
+watch(() => model.value, (val) => {
+  if (isEmpty(initModel)) {
+    initModel = cloneDeep(val)
+  }
+  emit('update:modelValue', val)
+}, {
+  deep: true,
+})
+
 // 保证获取正确的表单校验
-const validModel = ref<RecordAble>({})
+const validModel = ref<Recordable>({})
 const updateValidModel = (key: string, val: unknown) => {
   validModel.value[key] = val
 }
 
 const { linkChildren } = useChildren(formFieldKey)
-linkChildren({ model: modelValue, updateModel, updateValidModel, validModel })
+linkChildren({ model, updateModel, updateValidModel, validModel })
 
 const formRef = ref() as Ref<FormInstance>
-
 const bindLyaout = computed(() => {
   return isBoolean(props.layout) ? undefined : props.layout
 })

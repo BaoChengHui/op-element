@@ -1,7 +1,7 @@
-import type { BooleanAble, Promisable } from '../types'
+import type { Booleanable, Promisable } from '../types'
 import { isBoolean, isFunction, isPromise, isString } from './is'
 
-export const booleanAbleExecuter = (it: BooleanAble, ...arg: any[]): boolean => {
+export const booleanAbleExecuter = (it: Booleanable, ...arg: any[]): boolean => {
   if (isBoolean(it)) {
     return it
   }

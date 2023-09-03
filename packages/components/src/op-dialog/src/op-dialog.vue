@@ -32,6 +32,13 @@ const props = withDefaults(defineProps<{
   cancelButtonText: '取消',
 })
 
+const emit = defineEmits<{
+  (e: 'cancel'): void
+  (e: 'confirm'): void
+}>()
+
+const modelValue = defineModel<boolean>({ default: false })
+
 const scrollBarRef = ref<ComponentPublicInstance>()
 
 const initHeight = () => {
@@ -66,10 +73,19 @@ const handlerOpened = () => {
           }px`
   }
 }
+
+const handlerCancel = () => {
+  modelValue.value = false
+  emit('cancel')
+}
+
+const handlerConfrim = () => {
+  emit('confirm')
+}
 </script>
 
 <template>
-  <ElDialog :close-on-click-modal="false" @open="handlerOpened">
+  <ElDialog v-model="modelValue" :close-on-click-modal="false" @open="handlerOpened">
     <ElScrollbar ref="scrollBarRef" :max-height="maxHeight">
       <slot />
     </ElScrollbar>
@@ -79,6 +95,7 @@ const handlerOpened = () => {
           v-if="showCancelButton"
           :loading="cancelButtonLoading"
           :disabled="confirmButtonLoading"
+          @click="handlerCancel"
         >
           {{ cancelButtonText }}
         </ElButton>
@@ -86,6 +103,7 @@ const handlerOpened = () => {
           v-if="showConfirmButton" type="primary"
           :loading="confirmButtonLoading"
           :disabled="confirmButtonDisabled"
+          @click="handlerConfrim"
         >
           {{ confirmButtonText }}
         </ElButton>

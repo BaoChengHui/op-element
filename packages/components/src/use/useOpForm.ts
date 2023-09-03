@@ -1,9 +1,9 @@
 import { type MaybeRef, type Ref, type UnwrapRef, computed, onMounted, reactive, ref, unref } from 'vue'
 import type { OpFields, OpFormInstance, OpFormProps } from '../op-form'
-import type { Promisable, RecordAble } from '../types'
+import type { Promisable, Recordable } from '../types'
 import { isEmpty, isPromise, promiseAbelExcuter } from '../utils'
 
-export interface UseOpFormOptions<P, D = Partial<P & RecordAble>> {
+export interface UseOpFormOptions<P, D = Partial<P & Recordable>> {
   fields?: MaybeRef<OpFields>
   formProps?: MaybeRef<OpFormProps>
   onSubmit?: (params: Readonly<Partial<D>>) => Promise<void> | void
@@ -18,7 +18,7 @@ export interface UseOpFormOptions<P, D = Partial<P & RecordAble>> {
    */
   assignAll?: boolean
 }
-export function useOpForm<T extends RecordAble>(options: UseOpFormOptions<T>) {
+export function useOpForm<T extends Recordable>(options: UseOpFormOptions<T>) {
   const { fields = [], onSubmit, formProps = {}, onSuccess, init } = options
 
   const model = ref({}) as Ref<T>

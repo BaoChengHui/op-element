@@ -1,12 +1,12 @@
 import type { Component } from 'vue'
 import { ElDatePicker, ElInput, ElInputNumber, ElSwitch } from 'element-plus'
 import { OpSelect } from '../../op-select'
-import type { RecordAble } from '../../types'
+import type { Recordable } from '../../types'
 import type { FieldType } from './op-field.type'
 
 export interface FieldConfig {
   component: Component
-  defaultProps?: RecordAble
+  defaultProps?: Recordable
 }
 
 export const fieldConfigMap = new Map<FieldType, FieldConfig>([

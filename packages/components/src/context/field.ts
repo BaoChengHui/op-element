@@ -1,9 +1,9 @@
 import type { InjectionKey, Ref } from 'vue'
-import type { ElColProps, RecordAble } from '../types'
+import type { ElColProps, Recordable } from '../types'
 
 export const formFieldKey = Symbol('FormField') as InjectionKey<{
-  model: Ref<RecordAble>
-  validModel: Ref<RecordAble>
+  model: Ref<Recordable>
+  validModel: Ref<Recordable>
   updateModel: (path: string, val: unknown, arrKey?: string, arrIndex?: string) => void
   updateValidModel: (key: string, val: unknown) => void
 }>

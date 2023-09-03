@@ -1,5 +1,6 @@
 /**
- * https://github.com/youzan/vant/tree/main/packages/vant-use/src/useRelation
+ * fork
+ * @link https://github.com/youzan/vant/tree/main/packages/vant-use/src/useRelation
  */
 import type {
   ComponentInternalInstance,

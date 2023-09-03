@@ -1,12 +1,12 @@
 import type { OpFiledProps } from '../../op-field'
-import type { BooleanAble, ElColProps, ElFormItemProps, ElFormProps, PickComponentProps } from '../../types'
+import type { Booleanable, ElColProps, ElFormItemProps, ElFormProps, PickComponentProps } from '../../types'
 import type opFormVue from './op-form.vue'
 
 type OpFieldItem = OpFiledProps & {
   /**
      * @default true
      */
-  visible?: BooleanAble
+  visible?: Booleanable
 } & ElFormItemProps
 
 export type OpFields = OpFieldItem[]
