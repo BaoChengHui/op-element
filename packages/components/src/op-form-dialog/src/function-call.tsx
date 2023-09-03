@@ -1,4 +1,4 @@
-import { type ComponentPublicInstance, getCurrentInstance, ref, watch } from 'vue'
+import { type Component, type ComponentPublicInstance, getCurrentInstance, ref, shallowRef, watch } from 'vue'
 import { mountComponent } from '../../utils'
 import { type UseFormDialogOptions, useFormDialog } from '../../use'
 import type { Recordable } from '../../types'
@@ -17,10 +17,12 @@ function initInstance() {
   const res = mountComponent({
     setup() {
       const isDestory = ref(false)
-      const setConfig = (options: UseFormDialogOptions<Recordable> & Destory) => {
+      const formComponent = shallowRef()
+      const setConfig = (options: UseFormDialogOptions<Recordable> & Destory, component?: Component) => {
         const { destroyOnClosed = false, ...params } = options
         isDestory.value = destroyOnClosed
         config.value = params
+        formComponent.value = component
       }
       const uid = getCurrentInstance()!.uid
       const config = ref<Recordable>({})
@@ -36,11 +38,12 @@ function initInstance() {
         setConfig,
         uid,
         handlerClosed,
+        formComponent,
       }
     },
     render() {
-      const { config, handlerClosed } = this
-      return <OpFormDialog {...config} onClosed={handlerClosed}/>
+      const { config, handlerClosed, formComponent } = this
+      return <OpFormDialog {...config} onClosed={handlerClosed} formComponent={formComponent}/>
     },
   })
 
@@ -53,8 +56,10 @@ export function FormDialog<T extends Recordable, P extends T = T & Recordable>(o
   let handlerSuccess: any = () => {}
   let handlerCancel: any = () => {}
 
-  const { callCreate, callModify, config } = useFormDialog({
-    ...options,
+  const { formComponent, ...others } = options
+
+  const { callCreate, callModify, config, formRef } = useFormDialog({
+    ...others,
     onSuccess() {
       handlerSuccess()
     },
@@ -69,7 +74,7 @@ export function FormDialog<T extends Recordable, P extends T = T & Recordable>(o
       if (!instances[instance?.uid]) {
         instance = initInstance()
         watch(() => config.value, () => {
-          instance.setConfig(Object.assign({}, config.value, options))
+          instance.setConfig(Object.assign({}, config.value, options), formComponent)
         })
       }
       handlerSuccess = resolve
@@ -92,5 +97,6 @@ export function FormDialog<T extends Recordable, P extends T = T & Recordable>(o
   return {
     create,
     modify,
+    formRef,
   }
 }

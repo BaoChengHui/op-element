@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { FormInstance } from 'element-plus'
 import { ElForm } from 'element-plus'
-import { computed, nextTick, ref, toRaw, watch } from 'vue'
+import { computed, getCurrentInstance, nextTick, ref, toRaw, watch } from 'vue'
 import { cloneDeep, get, isEmpty, isEqual, omit, set } from 'lodash-es'
 import type { Ref } from 'vue'
 import { type FieldLayout, OpField } from '../../op-field'
 import { booleanAbleExecuter, isBoolean } from '../../utils'
-import { useChildren } from '../../use'
-import { formFieldKey } from '../../context'
+import { useChildren, useParent } from '../../use'
+import { formDialogKey, formFieldKey } from '../../context'
 import type { Recordable } from '../../types'
 import { OpFormLayout } from '../../op-form-layout'
 import type { OpFields } from './op-form.type'
@@ -96,12 +96,38 @@ const bindLyaout = computed(() => {
   return isBoolean(props.layout) ? undefined : props.layout
 })
 
+const validate: typeof formRef.value.validate = (...arg) => {
+  return formRef.value.validate(...arg)
+}
+const validateField: typeof formRef.value.validateField = (...arg) => {
+  return formRef.value.validateField(...arg)
+}
+const resetFields: typeof formRef.value.resetFields = (...arg) => {
+  return formRef.value.resetFields(...arg)
+}
+const scrollToField: typeof formRef.value.scrollToField = (...arg) => {
+  return formRef.value.scrollToField(...arg)
+}
+const clearValidate: typeof formRef.value.clearValidate = (...arg) => {
+  return formRef.value.clearValidate(...arg)
+}
+const instance = getCurrentInstance()!
+Object.assign(instance.proxy as object, {
+  validate,
+  validateField,
+  resetFields,
+  clearValidate,
+  scrollToField,
+})
+
+useParent(formDialogKey)
+
 defineExpose({
-  validate: computed(() => formRef.value.validate),
-  validateField: computed(() => formRef.value.validateField),
-  resetFields: computed(() => formRef.value.resetFields),
-  scrollToField: computed(() => formRef.value.scrollToField),
-  clearValidate: computed(() => formRef.value.clearValidate),
+  validate,
+  validateField,
+  resetFields,
+  clearValidate,
+  scrollToField,
 })
 </script>
 

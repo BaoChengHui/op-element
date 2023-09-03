@@ -1,6 +1,7 @@
 <script setup lang="tsx">
 import { FormDialog, useFormDialog } from 'components'
 import { reactive, ref } from 'vue'
+import SomeForm from './SomeForm.vue'
 
 const { config, callCreate, callModify } = useFormDialog<{
   name: string
@@ -24,13 +25,10 @@ const formDialog = FormDialog<{
   address: string
 }>({
   title: '个人信息',
-  fields: [
-    { label: '姓名', prop: 'name', required: true },
-    { label: '地址', prop: 'address', required: true },
-  ],
   onSubmit(params) {
     console.log('params', params)
   },
+  formComponent: SomeForm,
 })
 
 const handlerModify = () => {

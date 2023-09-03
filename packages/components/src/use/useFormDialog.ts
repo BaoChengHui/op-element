@@ -1,9 +1,11 @@
-import { type MaybeRef, type Ref, computed, nextTick, ref, toRaw, unref } from 'vue'
+import { type MaybeRef, type Ref, computed, nextTick, ref, shallowRef, toRaw, unref, watch } from 'vue'
 import { cloneDeep, omit, pick } from 'lodash-es'
 import type { OpFields, OpFormInstance } from '../op-form'
-import type { OpFormDialogProps } from '../op-form-dialog'
+import type { OpFormDialogInstance, OpFormDialogProps } from '../op-form-dialog'
 import type { Arrayable, Promisable, Recordable } from '../types'
 import { isEmpty, promiseAbelExcuter } from '../utils'
+import { formDialogKey } from '../context'
+import { useChildren } from './useRelation'
 
 export type UseFormDialogOptions<T, P extends T = T & Recordable> = OpFormDialogProps & {
   fields?: MaybeRef<OpFields>
@@ -23,6 +25,7 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
     fields = [],
     title,
     fullTitle,
+    formProps = {},
     modelKeys = 'id',
     assignAll = false,
     onCreate,
@@ -36,8 +39,13 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
   const visible = ref(false)
   const model = ref<Recordable>({})
   const isModify = ref(false)
-  const formRef = ref<OpFormInstance>()
   let modifyData: Recordable = {}
+
+  const dialogRef = ref<OpFormDialogInstance>()
+
+  const formRef = computed(() => {
+    return dialogRef.value?.formRef
+  })
 
   const getSubmitData = () => {
     if (assignAll) {
@@ -96,6 +104,9 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
       'onUpdate:model': (val: Recordable) => {
         model.value = val
       },
+      ref(ref, refs) {
+        dialogRef.value = ref as any
+      },
       'onConfirm': handlerConfirm,
       'onClosed': reset,
       onOpen() {
@@ -115,9 +126,10 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
       'cancelButtonDisabled': loading.value,
       'formProps': {
         fields: unref(fields),
-        ref(ref) {
-          formRef.value = ref as OpFormInstance
-        },
+        ...unref(formProps),
+        // ref(ref) {
+        //   formRef.value = ref as OpFormInstance
+        // },
       },
       ...omit(others),
     }
