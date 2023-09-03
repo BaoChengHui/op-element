@@ -31,7 +31,6 @@ const formDialog = FormDialog<{
   onSubmit(params) {
     console.log('params', params)
   },
-  destroyOnClosed: true,
 })
 
 const handlerModify = () => {

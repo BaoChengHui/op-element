@@ -63,7 +63,8 @@ export function FormDialog<T extends Recordable, P extends T = T & Recordable>(o
     },
   })
   let instance: FormDialogInstance
-  const create = (options: OpFormDialogProps = {}) => {
+
+  const init = (options: OpFormDialogProps = {}, callback: () => void) => {
     return new Promise((resolve, reject) => {
       if (!instances[instance?.uid]) {
         instance = initInstance()
@@ -71,26 +72,23 @@ export function FormDialog<T extends Recordable, P extends T = T & Recordable>(o
           instance.setConfig(Object.assign({}, config.value, options))
         })
       }
-      callCreate()
       handlerSuccess = resolve
       handlerCancel = reject
+      callback()
+    })
+  }
+
+  const create = (options: OpFormDialogProps = {}) => {
+    return init(options, () => {
+      callCreate()
     })
   }
 
   const modify = (data: Partial<P>, options: OpFormDialogProps = {}) => {
-    return new Promise((resolve, reject) => {
-      if (!instances[instance?.uid]) {
-        instance = initInstance()
-        watch(() => config.value, () => {
-          instance.setConfig(Object.assign({}, config.value, options))
-        })
-      }
+    return init(options, () => {
       callModify(data)
-      handlerSuccess = resolve
-      handlerCancel = reject
     })
   }
-
   return {
     create,
     modify,
