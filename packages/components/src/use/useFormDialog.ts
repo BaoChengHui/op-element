@@ -104,7 +104,7 @@ export function useFormDialog<T extends Recordable, P extends T = T & Recordable
       'onUpdate:model': (val: Recordable) => {
         model.value = val
       },
-      ref(ref, refs) {
+      ref(ref) {
         dialogRef.value = ref as any
       },
       'onConfirm': handlerConfirm,

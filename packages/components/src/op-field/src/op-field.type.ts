@@ -25,3 +25,4 @@ export type PFC<T extends FieldType> = T extends FieldType ? { type: T; props?: 
 export type FieldCompoent = PFC<FieldType>
 export type OpFieldProps = PickComponentProps<typeof opFieldVue>
 export type FieldLayout = boolean | number | ElColProps
+export type OpFieldInstance = InstanceType<typeof opFieldVue>

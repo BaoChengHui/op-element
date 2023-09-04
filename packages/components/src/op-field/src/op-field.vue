@@ -1,7 +1,7 @@
 <script lang="tsx" setup>
 import { ElCol, ElFormItem, type FormItemRule } from 'element-plus'
-import { computed, h, watch } from 'vue'
-import { get, isNumber } from 'lodash-es'
+import { computed, getCurrentInstance, h, reactive, ref, watch } from 'vue'
+import { get, isNumber, isString } from 'lodash-es'
 import { useParent } from '../../use'
 import { arrayFieldKey, formFieldKey, formLayoutKey } from '../../context'
 import { getArrDestructorKeys, getObjDestructorkeys, isArray, isEmpty, isPlainObject } from '../../utils'
@@ -68,154 +68,95 @@ const target = computed(() => {
 
 const { parent: parentForm } = useParent(formFieldKey)
 const { parent: parentArrayField } = useParent(arrayFieldKey)
-const arrNames = getArrDestructorKeys(props.prop)
-const objNames = getObjDestructorkeys(props.prop)
 
-const getIndexAndName = () => {
-  let baseName = ''
-  let arrIndex = ''
+const valuePaths = computed(() => {
   if (props.prop) {
-    const res = props.prop.match(/^((\d+)\.)?(\S+)/)
-    if (res) {
-      arrIndex = res[2]
-      baseName = res[3]
-      if (parentArrayField?.prop && !arrIndex) {
-        console.warn(`prop ${props.prop}  is invalid , may like 0.${props.prop}`)
+    const paths = props.prop.split('.')
+    const ends = paths[paths.length - 1]
+    const arrNames = getArrDestructorKeys(ends)
+    if (arrNames) {
+      return arrNames.reduce((prev: string[], name) => {
+        if (parentArrayField?.prop) {
+          return [...prev, `${parentArrayField.prop}.${paths[0]}.${name}`]
+        }
+        else {
+          return [...prev, name]
+        }
+      }, [])
+    }
+    else {
+      if (parentArrayField?.prop) {
+        return `${parentArrayField.prop}.${paths[0]}.${ends}`
+      }
+      else {
+        return ends
       }
     }
   }
   else {
-    console.warn(`prop ${props.prop}  is invalid`)
+    return ''
   }
-  return {
-    baseName,
-    arrIndex,
-  }
-}
+})
 
-const parentModelAble = () => {
-  return !!(parentForm && props.prop)
-}
-
-const modelValue = computed({
-  get: () => {
-    if (parentModelAble()) {
-      const { arrIndex, baseName } = getIndexAndName()
-      if (arrNames) {
-        return arrNames.reduce((prev: unknown[], name) => {
-          let path = name
-          if (parentArrayField?.prop) {
-            path = `${parentArrayField.prop}.${arrIndex}.${name}`
-          }
-          const val = get(parentForm?.model, path)
-          if (isEmpty(val)) {
-            return prev
-          }
-          else {
-            return [...prev, val]
-          }
-        }, [])
-      }
-      else if (objNames) {
-        return objNames.reduce((prev, name) => {
-          let [originKey, targetKey] = name.split(':')
-          if (!targetKey) {
-            targetKey = originKey
-          }
-          let path = targetKey
-          if (parentArrayField?.prop) {
-            path = `${parentArrayField?.prop}.${arrIndex}.${targetKey}`
-          }
-          const val = get(parentForm?.model.value, path)
-          return {
-            ...prev,
-            [originKey]: val,
-          }
-        }, {})
-      }
-      else {
-        let path = baseName
-        if (parentArrayField?.prop) {
-          path = `${parentArrayField.prop}.${arrIndex}.${path}`
-        }
-        return get(parentForm?.model.value, path)
-      }
+const validPath = computed(() => {
+  if (props.prop) {
+    if (parentArrayField?.prop) {
+      return `${parentArrayField.prop}.${props.prop}`
     }
     else {
-      return null
+      return props.prop
     }
-  },
-  set: (val) => {
-    if (parentModelAble()) {
-      const { arrIndex, baseName } = getIndexAndName()
-      if (arrNames) {
-        arrNames.forEach((name, index) => {
-          let path = name
-          if (parentArrayField?.prop) {
-            path = `${parentArrayField.prop}.${arrIndex}.${name}`
-          }
-          if (isArray(val)) {
-            parentForm!.updateModel(path, val[index])
-          }
-          else {
-            parentForm!.updateModel(path, undefined)
-          }
-        })
-      }
-      else if (objNames) {
-        objNames.forEach((name) => {
-          let [originKey, targetKey] = name.split(':')
-
-          if (!targetKey) {
-            targetKey = originKey
-          }
-          let path = targetKey
-          if (parentArrayField?.prop) {
-            path = `${parentArrayField.prop}.${arrIndex}.${targetKey}`
-          }
-          if (isPlainObject(val)) {
-            parentForm!.updateModel(path, val[originKey as keyof typeof val])
-          }
-          else {
-            parentForm!.updateModel(path, undefined)
-          }
-        })
-      }
-      else {
-        let path = baseName
-        if (parentArrayField?.prop) {
-          path = `${parentArrayField.prop}.${arrIndex}.${path}`
-        }
-        parentForm!.updateModel(path, val)
-      }
-    }
-  },
+  }
+  else {
+    return ''
+  }
 })
 
-const updateValidModel = () => {
-  if (parentModelAble()) {
-    let path = props.prop!
-    if (parentArrayField?.prop) {
-      path = `${parentArrayField?.prop}.${path}`
+const modelValue = ref<unknown>()
+
+const getUpdateInfos = (val: unknown) => {
+  if (validPath.value) {
+    if (isString(valuePaths.value)) {
+      return {
+        path: valuePaths.value, val,
+      }
     }
-    parentForm?.updateValidModel(path, modelValue.value)
+    else if (isArray(valuePaths.value)) {
+      return valuePaths.value.map((path, index) => {
+        return { path, val: isArray(val) ? val[index] : undefined }
+      })
+    }
   }
 }
 
-const updateValue = (val: unknown) => {
+function updateParentModel(val: unknown) {
+  const updateInfo = getUpdateInfos(val)
+  if (updateInfo) {
+    parentForm?.updateModel(updateInfo)
+  }
+}
+const updateModelValue = (val: unknown) => {
   modelValue.value = val
-  updateValidModel()
+  if (validPath.value) {
+    parentForm?.updateValidModel(validPath.value, val)
+  }
+  updateParentModel(val)
 }
 
-updateValue(null)
-
-watch(() => modelValue.value, () => {
-  updateValidModel()
-})
-
-watch(() => parentForm?.validModel.value[props.prop!], (val) => {
+const setModelValue = (val: unknown) => {
   modelValue.value = val
-})
+}
+
+const initValue = () => {
+  if (props.defaultValue) {
+    updateModelValue(props.defaultValue)
+  }
+  else {
+    updateModelValue(undefined)
+  }
+}
+
+initValue()
 
 const { parent: parentLayout } = useParent(formLayoutKey)
 
@@ -246,6 +187,22 @@ const innerLayout = computed(() => {
   return {}
 })
 
+const instance = getCurrentInstance()!
+
+Object.assign(instance.proxy as object, reactive({
+  validPath,
+  setModelValue,
+  getUpdateInfos,
+  valuePaths,
+}))
+
+defineExpose({
+  validPath,
+  setModelValue,
+  getUpdateInfos,
+  valuePaths,
+})
+
 const renderItem = () => {
   return <ElFormItem {...formItemProps.value} >{renderComponent()}</ElFormItem>
 }
@@ -254,7 +211,7 @@ function renderComponent() {
   return h(target.value.TargetComponent, {
     ...target.value.props,
     'modelValue': modelValue.value,
-    'onUpdate:modelValue': updateValue,
+    'onUpdate:modelValue': updateModelValue,
   })
 }
 
