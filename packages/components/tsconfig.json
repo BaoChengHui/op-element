@@ -6,7 +6,7 @@
     "composite": true,
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["element-plus/global","unplugin-vue-macros/macros-global"],
+    "types": ["element-plus/global","unplugin-vue-macros/macros-global","async-validator"],
     "moduleResolution": "node"
   }
 }

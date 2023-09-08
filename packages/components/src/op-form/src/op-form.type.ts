@@ -1,6 +1,11 @@
 import type { OpFiledProps } from '../../op-field'
-import type { Booleanable, ElColProps, ElFormItemProps, ElFormProps, PickComponentProps } from '../../types'
+import type { Booleanable, ElColProps, ElFormItemProps, ElFormProps, PickComponentProps, Recordable } from '../../types'
 import type opFormVue from './op-form.vue'
+
+export interface BindForm<T extends object = Recordable> {
+  model: T
+  setModel: (data: Recordable) => void
+}
 
 type OpFieldItem = OpFiledProps & {
   /**
@@ -11,4 +16,4 @@ type OpFieldItem = OpFiledProps & {
 
 export type OpFields = OpFieldItem[]
 export type OpFormInstance = InstanceType<typeof opFormVue>
-export type OpFormProps = PickComponentProps<typeof opFormVue> & ElFormProps
+export type OpFormProps = PickComponentProps<typeof opFormVue>

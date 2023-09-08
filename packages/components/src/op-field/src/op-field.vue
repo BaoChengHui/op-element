@@ -1,10 +1,11 @@
 <script lang="tsx" setup>
 import { ElCol, ElFormItem, type FormItemRule } from 'element-plus'
 import { computed, getCurrentInstance, h, reactive, ref, watch } from 'vue'
-import { get, isNumber, isString } from 'lodash-es'
+import { get, isNumber, isString, set } from 'lodash-es'
 import { useParent } from '../../use'
 import { arrayFieldKey, formFieldKey, formLayoutKey } from '../../context'
 import { getArrDestructorKeys, getObjDestructorkeys, isArray, isEmpty, isPlainObject } from '../../utils'
+import type { Recordable } from '../../types'
 import type { FieldCompoent, FieldLayout } from './op-field.type'
 import { fieldConfigMap } from './map'
 
@@ -18,7 +19,7 @@ const props = withDefaults(defineProps<{
   prop?: string
   rules?: FormItemRule[]
   label?: string
-  defaultValue?: unknown
+  default?: unknown
   layout?: FieldLayout
 }>(), {
   component: () => {
@@ -112,14 +113,14 @@ const validPath = computed(() => {
   }
 })
 
-const modelValue = ref<unknown>()
-
 const getUpdateInfos = (val: unknown) => {
   if (validPath.value) {
     if (isString(valuePaths.value)) {
-      return {
-        path: valuePaths.value, val,
-      }
+      return [
+        {
+          path: valuePaths.value, val,
+        },
+      ]
     }
     else if (isArray(valuePaths.value)) {
       return valuePaths.value.map((path, index) => {
@@ -129,34 +130,60 @@ const getUpdateInfos = (val: unknown) => {
   }
 }
 
-function updateParentModel(val: unknown) {
-  const updateInfo = getUpdateInfos(val)
-  if (updateInfo) {
-    parentForm?.updateModel(updateInfo)
-  }
-}
+const modelValue = computed({
+  get: () => {
+    const paths = valuePaths.value
+    if (paths) {
+      if (isString(paths)) {
+        return get(parentForm?.model.value, paths)
+      }
+      else if (isArray(paths)) {
+        return paths.map((path) => {
+          return get(parentForm?.model.value, path)
+        }).filter(val => !isEmpty(val))
+      }
+    }
+    return null
+  },
+  set: (val) => {
+    const updateInfos = getUpdateInfos(val)
+    if (updateInfos) {
+      updateInfos.forEach((item) => {
+        set(parentForm!.model.value, item.path, item.val)
+      })
+    }
+  },
+})
+
 const updateModelValue = (val: unknown) => {
   modelValue.value = val
-  if (validPath.value) {
-    parentForm?.updateValidModel(validPath.value, val)
-  }
-  updateParentModel(val)
+  parentForm?.updateValidModel(validPath.value, val)
 }
 
-const setModelValue = (val: unknown) => {
-  modelValue.value = val
+const initModelValue = () => {
+  if (props.default) {
+    modelValue.value = props.default
+  }
+  updateModelValue(modelValue.value)
 }
 
-const initValue = () => {
-  if (props.defaultValue) {
-    updateModelValue(props.defaultValue)
-  }
-  else {
-    updateModelValue(undefined)
-  }
-}
+initModelValue()
 
-initValue()
+const instance = getCurrentInstance()!
+
+const validInfo = computed(() => {
+  return {
+    [validPath.value]: modelValue.value,
+  } as Recordable
+})
+
+Object.assign(instance.proxy as object, reactive({
+  validInfo,
+}))
+
+defineExpose({
+  validInfo,
+})
 
 const { parent: parentLayout } = useParent(formLayoutKey)
 
@@ -185,22 +212,6 @@ const innerLayout = computed(() => {
     return pLayout
   }
   return {}
-})
-
-const instance = getCurrentInstance()!
-
-Object.assign(instance.proxy as object, reactive({
-  validPath,
-  setModelValue,
-  getUpdateInfos,
-  valuePaths,
-}))
-
-defineExpose({
-  validPath,
-  setModelValue,
-  getUpdateInfos,
-  valuePaths,
 })
 
 const renderItem = () => {

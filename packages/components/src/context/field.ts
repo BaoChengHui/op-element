@@ -3,11 +3,6 @@ import type { Arrayable, ElColProps, Recordable } from '../types'
 
 export const formFieldKey = Symbol('FormField') as InjectionKey<{
   model: Ref<Recordable>
-  validModel: Ref<Recordable>
-  updateModel: (infos: Arrayable<{
-    path: string
-    val: unknown
-  }>) => void
   updateValidModel: (key: string, val: unknown) => void
 }>
 
