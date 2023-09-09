@@ -21,13 +21,13 @@ const handlerReset = () => {
 
 const fields: OpFields = [
   { label: '姓名', prop: 'name' },
-  { label: '城市', prop: 'city' },
-  { label: '城市', prop: 'city1' },
-  { label: '城市', prop: 'city2' },
-  { label: '城市', prop: 'city3' },
-  { label: '城市', prop: 'city4' },
-  { label: '城市', prop: 'city5' },
-  { label: '城市', prop: 'city6' },
+  { label: '城市1', prop: 'city' },
+  { label: '城市2', prop: 'city1' },
+  { label: '城市3', prop: 'city2' },
+  // { label: '城市4', prop: 'city3' },
+  // { label: '城市5', prop: 'city4' },
+  // { label: '城市6', prop: 'city5' },
+  // { label: '城市7', prop: 'city6' },
   { label: '时间', prop: '[start,end]', component: { type: 'daterange' } },
 ]
 </script>
