@@ -36,6 +36,8 @@ const props = withDefaults(defineProps<{
   },
 })
 
+const emit = defineEmits(['update'])
+
 const { model } = toRefs(props.form)
 const { setModel } = props.form
 let defaultModel: Recordable = {}
@@ -77,6 +79,7 @@ const validateField: typeof formRef.value.validateField = (...arg) => {
 const resetFields = () => {
   setModel(defaultModel)
   clearValidate()
+  emit('update')
 }
 const scrollToField: typeof formRef.value.scrollToField = (...arg) => {
   return formRef.value.scrollToField(...arg)

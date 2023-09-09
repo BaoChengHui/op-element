@@ -21,7 +21,8 @@
     "lodash-es":"^4.17.21",
     "@types/lodash-es":"^4.17.8",
     "@vueuse/core":"^10.4.1",
-    "async-validator":"^4.2.5"
+    "async-validator":"^4.2.5",
+    "@element-plus/icons":"^0.0.11"
   },
   "scripts": {
     "build": "vite build"
