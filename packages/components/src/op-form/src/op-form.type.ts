@@ -16,4 +16,4 @@ type OpFieldItem = OpFiledProps & {
 
 export type OpFields = OpFieldItem[]
 export type OpFormInstance = InstanceType<typeof opFormVue>
-export type OpFormProps = PickComponentProps<typeof opFormVue>
+export type OpFormProps = PickComponentProps<typeof opFormVue> & ElFormProps

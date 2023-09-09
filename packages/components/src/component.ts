@@ -8,6 +8,7 @@ import { OpFormLayout } from './op-form-layout'
 import { OpDialog } from './op-dialog'
 import { OpFormDialog } from './op-form-dialog'
 import { OpSearchForm } from './op-search-form'
+import { OpTablePage } from './op-table-page'
 
 export default [
   OpTable,
@@ -19,4 +20,5 @@ export default [
   OpDialog,
   OpFormDialog,
   OpSearchForm,
+  OpTablePage,
 ] as Plugin[]

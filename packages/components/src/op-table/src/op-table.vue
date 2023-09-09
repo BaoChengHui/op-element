@@ -1,19 +1,24 @@
-<script lang="tsx" setup generic="T">
+<script lang="tsx" setup>
 import { ElTable, ElTableColumn } from 'element-plus'
 import { omit } from 'lodash-es'
 import { useSlots } from 'vue'
-import type { OpTableColumn, OpTableProps } from './op-table.type'
+import type { Recordable } from '../../types'
+import type { OpTableColumn } from './op-table.type'
 import { tablePlugin } from './plugins'
 
 defineOptions({
   name: 'OpTable',
 })
 
-const props = defineProps<OpTableProps<T>>()
+const props = withDefaults(defineProps<{
+  columns?: OpTableColumn<Recordable>[]
+}>(), {
+  columns: () => [],
+})
 
 const slots = useSlots()
 
-function renderColumns(columns: OpTableColumn<T>[]) {
+function renderColumns(columns: OpTableColumn<Recordable>[]) {
   return columns.map((col, index) => {
     const colProps = omit(col, ['children', 'renderHeader', 'visible'])
     if (tablePlugin.plugin.value) {
