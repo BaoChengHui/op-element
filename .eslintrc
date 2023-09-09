@@ -5,7 +5,7 @@
         "antfu/top-level-function":"off",
         "@typescript-eslint/ban-types":"off",
         "curly":"off",
-        "unused-imports/no-unused-imports":"off",
+        "unused-imports/no-unused-imports":"warn",
         "@typescript-eslint/no-use-before-define":"off"
     }
 }

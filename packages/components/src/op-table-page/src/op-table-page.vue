@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { ElPagination } from 'element-plus'
-import type { OpSearchFormProps } from '../../op-search-form'
+import { computed, useSlots } from 'vue'
+import { isEmpty } from 'element-plus/es/utils'
 import { OpSearchForm } from '../../op-search-form'
-
 import { OpTable, type OpTableProps } from '../../op-table'
+import type { OpSearchFormProps } from '../../op-search-form'
 import type { ElPaginationProps } from '../../types'
 
 defineOptions({
@@ -20,6 +21,14 @@ const props = withDefaults(defineProps<{
   searchFormProps: () => ({}),
   paginationProps: () => ({}),
 })
+
+const hasSearch = computed(() => {
+  return !isEmpty(props.searchFormProps.fields?.length)
+})
+const slots = useSlots()
+const showSearch = computed(() => {
+  return hasSearch.value || slots.search
+})
 </script>
 
 <template>
@@ -27,9 +36,9 @@ const props = withDefaults(defineProps<{
     <div v-if="title" class="op-table-page-title">
       {{ title }}
     </div>
-    <div class="op-table-page-search">
+    <div v-if="showSearch" class="op-table-page-search">
       <slot name="search">
-        <OpSearchForm v-bind="searchFormProps" />
+        <OpSearchForm v-if="hasSearch" v-bind="searchFormProps" />
       </slot>
     </div>
     <div class="op-table-page-action">

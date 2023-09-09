@@ -1,6 +1,6 @@
 import type { TableColumnCtx } from 'element-plus'
 import type { VNode } from 'vue'
-import type { PickComponentProps } from '../../types'
+import type { ElTableProps, PickComponentProps } from '../../types'
 import type opTableVue from './op-table.vue'
 
 declare interface CRI<T = any> {
@@ -19,4 +19,4 @@ export interface OpTableColumn<Row = any> extends Partial<Omit<TableColumnCtx<Ro
 }
 
 export type OpTableColumns = OpTableColumn[]
-export type OpTableProps = PickComponentProps<typeof opTableVue>
+export type OpTableProps = PickComponentProps<typeof opTableVue> & ElTableProps
