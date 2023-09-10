@@ -1,4 +1,3 @@
-import type { ElTable } from 'element-plus'
 import { withInstall } from '../utils'
 import opTablePage from './src/op-table-page.vue'
 

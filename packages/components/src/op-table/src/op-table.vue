@@ -11,7 +11,7 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<{
-  columns?: OpTableColumn<Recordable>[]
+  columns?: OpTableColumn<any>[]
 }>(), {
   columns: () => [],
 })

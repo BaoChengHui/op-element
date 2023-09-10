@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ElPagination } from 'element-plus'
 import { computed, useSlots } from 'vue'
-import { isEmpty } from 'element-plus/es/utils'
+import { isEmpty } from '../../utils'
 import { OpSearchForm } from '../../op-search-form'
 import { OpTable, type OpTableProps } from '../../op-table'
 import type { OpSearchFormProps } from '../../op-search-form'
@@ -47,7 +47,7 @@ const showSearch = computed(() => {
     <div class="op-table-page-body">
       <OpTable v-bind="tableProps" />
     </div>
-    <div class="op-table-page-paging">
+    <div v-if="paginationProps.total" class="op-table-page-paging">
       <ElPagination v-bind="paginationProps" />
     </div>
   </div>

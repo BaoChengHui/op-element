@@ -18,5 +18,5 @@ export interface OpTableColumn<Row = any> extends Partial<Omit<TableColumnCtx<Ro
   headerSlot?: string
 }
 
-export type OpTableColumns = OpTableColumn[]
+export type OpTableColumns<T = any> = OpTableColumn<T>[]
 export type OpTableProps = PickComponentProps<typeof opTableVue> & ElTableProps

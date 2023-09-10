@@ -14,5 +14,3 @@ export interface PaginResult<T = any> {
   total: number
   records: T[]
 }
-
-export type FetchPaginData<T> = (params: PaginParams & never) => Promise<PaginResult<T>>
