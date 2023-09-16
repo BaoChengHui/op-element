@@ -2,21 +2,21 @@
 import { useSelect } from 'components'
 import { ref } from 'vue'
 
-const list = [
+const list = ref([
   { label2: '111', value2: '1' },
   { label2: '222', value2: '2' },
   { label2: '333', value2: '3' },
   { label2: '444', value2: '4' },
   { label2: '555', value2: '5' },
   { label2: '666', value2: '6' },
-]
+])
 const fetchData = (data: { keyword: string }) => {
-  return Promise.resolve(list.filter(item => item.label2.includes(data.keyword)))
+  return Promise.resolve(list.value.filter(item => item.label2.includes(data.keyword)))
 }
 
 const { config } = useSelect({
-  fetch: fetchData,
-  remote: true,
+  // fetch: fetchData,
+  // remote: true,
   formatter(data) {
     return data.map((item) => {
       return {
@@ -29,6 +29,7 @@ const { config } = useSelect({
     filterable: true,
     remoteShowSuffix: true,
   },
+  options: list,
 })
 
 const value = ref()

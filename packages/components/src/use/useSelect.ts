@@ -1,4 +1,4 @@
-import { type MaybeRefOrGetter, computed, ref, shallowRef, toValue, unref } from 'vue'
+import { type MaybeRefOrGetter, computed, ref, shallowRef, toValue, unref, watchEffect } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import type { FetchAnything, Recordable, ReturnTypeOfFetch } from '../types'
 import type { OpSelectOption, OpSelectProps } from '../op-select'
@@ -24,12 +24,14 @@ export interface UseSelectOptions<T, Option> {
    */
   valueKey?: string
   formatter?: (data: Option[]) => OpSelectOption[]
+  options?: MaybeRefOrGetter<Option[]>
 }
 
 export function useSelect<T extends FetchAnything<any[]>, R = ReturnTypeOfFetch<T>, Option = R extends any[] ? R[number] : any >(options: UseSelectOptions<T, Option>) {
-  const { immediate = true, fetch, fetchParams, remote = false, remoteKeyword = 'keyword', labelKey = 'label', valueKey = 'value', selectProps, formatter } = options
+  const { immediate = true, fetch, fetchParams, remote = false, remoteKeyword = 'keyword', labelKey = 'label', valueKey = 'value', selectProps, formatter, options: list } = options
 
   const selectOptions = shallowRef<OpSelectOption[]>([])
+  const remoteData = shallowRef<Option[]>([])
   const remoteParams = ref<Recordable>({})
   const getFetchParams = () => {
     if (remote) {
@@ -66,6 +68,7 @@ export function useSelect<T extends FetchAnything<any[]>, R = ReturnTypeOfFetch<
     }
     await execute()
     if (isArray(data.value)) {
+      remoteData.value = data.value
       selectOptions.value = formatterOptions(data.value)
     }
     else {
@@ -93,6 +96,12 @@ export function useSelect<T extends FetchAnything<any[]>, R = ReturnTypeOfFetch<
     } as OpSelectProps
   })
 
+  if (list) {
+    watchEffect(() => {
+      selectOptions.value = formatterOptions(toValue(list))
+    })
+  }
+
   if (immediate && !remote) {
     fetchData()
   }
@@ -100,5 +109,7 @@ export function useSelect<T extends FetchAnything<any[]>, R = ReturnTypeOfFetch<
   return {
     loading,
     config,
+    remoteData,
+    selectOptions,
   }
 }
