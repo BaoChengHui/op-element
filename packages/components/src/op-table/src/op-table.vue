@@ -1,6 +1,6 @@
 <script lang="tsx" setup>
 import { ElTable, ElTableColumn } from 'element-plus'
-import { omit } from 'lodash-es'
+import { cloneDeep, omit } from 'lodash-es'
 import { useSlots } from 'vue'
 import type { Recordable } from '../../types'
 import type { OpTableColumn } from './op-table.type'
@@ -20,10 +20,13 @@ const slots = useSlots()
 
 function renderColumns(columns: OpTableColumn<Recordable>[]) {
   return columns.map((col, index) => {
-    const colProps = omit(col, ['children', 'renderHeader', 'visible'])
+    const colProps = cloneDeep(col)
+
     if (tablePlugin.plugin.value) {
-      const res = tablePlugin.plugin.value(col)
-      Object.assign(colProps, res)
+      tablePlugin.plugin.value.forEach((item) => {
+        const res = item(cloneDeep(col))
+        Object.assign(colProps, res)
+      })
     }
     const columnSlot: Record<string, any> = {
       default: (scope: any) => {
@@ -49,7 +52,9 @@ function renderColumns(columns: OpTableColumn<Recordable>[]) {
       }
     }
 
-    return <ElTableColumn {...colProps} key={col.prop ?? `${index}`}>{columnSlot}</ElTableColumn>
+    const bindProps = omit(colProps, ['renderHeader', 'children', 'renderHeader'])
+
+    return <ElTableColumn {...bindProps} key={`${index}-${bindProps.prop}`}>{columnSlot}</ElTableColumn>
   },
   )
 }
