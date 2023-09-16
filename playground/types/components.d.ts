@@ -7,8 +7,10 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    2: typeof import('./../src/components/App copy 2.vue')['default']
     App: typeof import('./../src/components/App.vue')['default']
     'App copy': typeof import('./../src/components/App copy.vue')['default']
+    'App copy 2': typeof import('./../src/components/App copy 2.vue')['default']
     copy: typeof import('./../src/components/App copy.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElForm: typeof import('element-plus/es')['ElForm']

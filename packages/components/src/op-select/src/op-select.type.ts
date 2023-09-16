@@ -1,4 +1,4 @@
-import type { PickComponentProps, Recordable } from '../../types'
+import type { ElSelectProps, PickComponentProps, Recordable } from '../../types'
 import type opSelect from './op-select.vue'
 
 export type OpSelectValueAble = string | number | Recordable | OpSelectValueAble[]
@@ -15,4 +15,4 @@ export interface OpSelectGroup {
   [p: string]: any
 }
 
-export type OpSelectProps = PickComponentProps<typeof opSelect>
+export type OpSelectProps = PickComponentProps<typeof opSelect> & ElSelectProps

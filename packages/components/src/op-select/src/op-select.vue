@@ -7,9 +7,11 @@ defineOptions({
   name: 'OpSelect',
 })
 
-const props = defineProps<{
-  options: OpSelectOption[] | OpSelectGroup[]
-}>()
+const props = withDefaults(defineProps<{
+  options?: OpSelectOption[] | OpSelectGroup[]
+}>(), {
+  options: () => [],
+})
 
 const isGroup = computed(() => {
   return props.options.length > 0 && !!props.options[0].options

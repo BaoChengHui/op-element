@@ -1,10 +1,10 @@
 <script lang="tsx" setup>
 import { ElCol, ElFormItem, type FormItemRule } from 'element-plus'
-import { computed, getCurrentInstance, h, reactive, ref, watch } from 'vue'
+import { computed, getCurrentInstance, h, reactive } from 'vue'
 import { get, isNumber, isString, set } from 'lodash-es'
 import { useParent } from '../../use'
 import { arrayFieldKey, formFieldKey, formLayoutKey } from '../../context'
-import { getArrDestructorKeys, getObjDestructorkeys, isArray, isEmpty, isPlainObject } from '../../utils'
+import { getArrDestructorKeys, isArray, isEmpty, isPlainObject } from '../../utils'
 import type { Recordable } from '../../types'
 import type { FieldCompoent, FieldLayout } from './op-field.type'
 import { fieldConfigMap } from './map'
@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<{
   label?: string
   default?: unknown
   layout?: FieldLayout
+  modelValue?: unknown
 }>(), {
   component: () => {
     return {
@@ -33,6 +34,8 @@ const props = withDefaults(defineProps<{
   },
   layout: true,
 })
+
+const emit = defineEmits(['update:modelValue'])
 
 const formItemProps = computed(() => {
   const { required, label, rules, component } = props
@@ -132,25 +135,35 @@ const getUpdateInfos = (val: unknown) => {
 
 const modelValue = computed({
   get: () => {
-    const paths = valuePaths.value
-    if (paths) {
-      if (isString(paths)) {
-        return get(parentForm?.model.value, paths)
+    if (parentForm) {
+      const paths = valuePaths.value
+      if (paths) {
+        if (isString(paths)) {
+          return get(parentForm?.model.value, paths)
+        }
+        else if (isArray(paths)) {
+          return paths.map((path) => {
+            return get(parentForm?.model.value, path)
+          }).filter(val => !isEmpty(val))
+        }
       }
-      else if (isArray(paths)) {
-        return paths.map((path) => {
-          return get(parentForm?.model.value, path)
-        }).filter(val => !isEmpty(val))
-      }
+      return null
     }
-    return null
+    else {
+      return props.modelValue
+    }
   },
   set: (val) => {
-    const updateInfos = getUpdateInfos(val)
-    if (updateInfos) {
-      updateInfos.forEach((item) => {
-        set(parentForm!.model.value, item.path, item.val)
-      })
+    if (parentForm) {
+      const updateInfos = getUpdateInfos(val)
+      if (updateInfos) {
+        updateInfos.forEach((item) => {
+          set(parentForm!.model.value, item.path, item.val)
+        })
+      }
+    }
+    else {
+      emit('update:modelValue', val)
     }
   },
 })
@@ -215,7 +228,12 @@ const innerLayout = computed(() => {
 })
 
 const renderItem = () => {
-  return <ElFormItem {...formItemProps.value} >{renderComponent()}</ElFormItem>
+  if (parentForm) {
+    return <ElFormItem {...formItemProps.value} >{renderComponent()}</ElFormItem>
+  }
+  else {
+    return renderComponent()
+  }
 }
 
 function renderComponent() {

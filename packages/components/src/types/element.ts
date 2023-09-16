@@ -1,5 +1,5 @@
 import type { ElCol, ElDatePicker, ElDialog, ElForm, ElFormItem, ElInput, ElInputNumber, ElPagination, ElSelect, ElSwitch, ElTable } from 'element-plus'
-import type { PickComponentProps } from './base'
+import type { PickComponentProps } from './vue'
 
 export type ElInputProps = PickComponentProps<typeof ElInput>
 export type ElSelectProps = PickComponentProps<typeof ElSelect>
