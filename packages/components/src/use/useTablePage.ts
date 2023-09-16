@@ -1,39 +1,39 @@
-import { type MaybeRefOrGetter, computed, onMounted, ref, shallowRef, toValue, watchEffect } from 'vue'
+import { type MaybeRefOrGetter, computed, onMounted, ref, shallowRef, toValue, unref, watchEffect } from 'vue'
+import type { OpTablePageProps } from '../op-table-page/src/op-table-page.type'
+import type { ElPaginationProps, FetchAnything, PaginResult, Recordable, ReturnTypeOfFetch } from '../types'
 import type { OpFields } from '../op-form'
 import type { OpSearchFormProps } from '../op-search-form'
 import type { OpTableColumns, OpTableProps } from '../op-table'
-import type { ElPaginationProps, PaginResult, Recordable } from '../types'
-import type { OpTablePageProps } from '../op-table-page/src/op-table-page.type'
 import { isArray } from '../utils'
 import { useCreateForm } from './useCreateForm'
+import { usePromiseExecuter } from './usePromiseExcuter'
 
-export interface UseTablePageOptions<T> {
+export interface UseTablePageOptions<T, ROW> {
   title?: string
-  columns: MaybeRefOrGetter<OpTableColumns<T>>
+  columns: MaybeRefOrGetter<OpTableColumns<ROW>>
+  fetch?: T
+  fetchParams?: MaybeRefOrGetter<Recordable>
   searchFields?: MaybeRefOrGetter<OpFields>
   tableProps?: MaybeRefOrGetter<OpTableProps>
   searchFormProps?: MaybeRefOrGetter<OpSearchFormProps>
   paginationProps?: MaybeRefOrGetter<ElPaginationProps>
-  fetch?: (...arg: any[]) => Promise<PaginResult<T>> | Promise< T[]>
-  fetchParams?: MaybeRefOrGetter<Recordable>
   immediate?: boolean
-  data?: MaybeRefOrGetter<T[]>
+  data?: MaybeRefOrGetter<ROW[]>
   nativePaging?: boolean
 }
 
-export function useTablePage<T>(options: UseTablePageOptions<T>) {
+export function useTablePage<
+T extends FetchAnything<PaginResult | any[]>, R = ReturnTypeOfFetch<T>, P = Parameters<T>[0], ROW = R extends PaginResult ? R['records'][number] : R extends any[] ? R[number] : any >(options: UseTablePageOptions<T, ROW>) {
   const { title, columns = [], searchFields, tableProps, searchFormProps, paginationProps, immediate = true, fetch, fetchParams = {}, nativePaging = false, data: list = [] } = options
 
-  const data = shallowRef<T[]>([])
-  const loading = ref(false)
   const paginInfo = ref({
     currentPage: toValue(paginationProps)?.defaultCurrentPage ?? 1,
     pageSize: toValue(paginationProps)?.defaultPageSize ?? 10,
   })
   const total = ref(0)
-  const remoteList = shallowRef<T[]>([])
+  const tableData = shallowRef<ROW[]>([])
+  const remoteData = shallowRef<ROW[]>([])
   const form = useCreateForm()
-
   const getFetchParams = () => {
     return {
       ...toValue(paginInfo),
@@ -42,56 +42,52 @@ export function useTablePage<T>(options: UseTablePageOptions<T>) {
     }
   }
 
+  const { execute, loading, data } = usePromiseExecuter({ fetch, fetchParams: getFetchParams, immediate: false })
+
   const fetchData = async (reset: boolean = false) => {
-    if (loading.value) {
-      return
-    }
     if (!fetch) {
       return
     }
-    try {
-      if (reset) {
-        paginInfo.value.currentPage = 1
-      }
-      loading.value = true
-      const res = await fetch(getFetchParams())
-      if (isArray(res)) {
-        remoteList.value = res
-      }
-      else {
-        data.value = res.records
-        total.value = res.total
-      }
+    if (reset) {
+      paginInfo.value.currentPage = 1
     }
-    finally {
-      loading.value = false
+    await execute()
+    if (isArray(data.value)) {
+      remoteData.value = data.value
+    }
+    else {
+      tableData.value = data.value?.records ?? []
+      total.value = data.value?.total ?? 0
     }
   }
 
   watchEffect(() => {
-    const listValue = remoteList.value.length ? remoteList.value : toValue(list)
+    const listValue = remoteData.value.length ? remoteData.value : toValue(list)
     const length = listValue.length
-    if (length) {
-      if (nativePaging) {
-        total.value = length
-        const { currentPage, pageSize } = paginInfo.value
-        const start = pageSize * (currentPage - 1)
-        data.value = listValue.slice(start, start + pageSize)
-      }
-      else {
-        data.value = listValue
-      }
+    if (nativePaging) {
+      total.value = length
+      const { currentPage, pageSize } = paginInfo.value
+      const start = pageSize * (currentPage - 1)
+
+      tableData.value = listValue.slice(start, start + pageSize)
+      return
     }
+
+    tableData.value = listValue
   })
 
   const handlerUpdateCurrentPage = (val: number) => {
     paginInfo.value.currentPage = val
-    fetchData()
+    if (!nativePaging) {
+      fetchData()
+    }
   }
 
   const handlerUpdatePageSize = (val: number) => {
     paginInfo.value.pageSize = val
-    fetchData(true)
+    if (!nativePaging) {
+      fetchData(true)
+    }
   }
 
   const config = computed<OpTablePageProps>(() => {
@@ -107,8 +103,8 @@ export function useTablePage<T>(options: UseTablePageOptions<T>) {
       },
       tableProps: {
         columns: toValue(columns),
-        data: toValue(data),
         ...toValue(tableProps),
+        data: unref(tableData),
       },
       paginationProps: {
         'onUpdate:current-page': handlerUpdateCurrentPage,
@@ -131,7 +127,7 @@ export function useTablePage<T>(options: UseTablePageOptions<T>) {
 
   return {
     config,
-    data,
     fetchData,
+    tableData,
   }
 }

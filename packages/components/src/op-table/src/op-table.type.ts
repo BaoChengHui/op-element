@@ -9,7 +9,7 @@ declare interface CRI<T = any> {
   $index: number
 }
 
-export interface OpTableColumn<Row = any> extends Partial<Omit<TableColumnCtx<Row>, 'renderCell' | 'children' | 'type'>> {
+export interface OpTableColumn<Row = any> extends Partial<Omit<TableColumnCtx<Row>, 'renderCell' | 'children' | 'type' >> {
   type?: 'selection' | 'index' | 'expand'
   visible?: boolean | (() => boolean)
   renderCell?: (data: CRI<Row>) => VNode

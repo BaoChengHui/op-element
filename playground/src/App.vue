@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useTablePage } from 'components'
 
-const { config } = useTablePage({
+const { config, tableData } = useTablePage({
   title: '新的冒险',
   searchFields: [
     { label: 'name', prop: 'name' },
@@ -19,23 +19,52 @@ const { config } = useTablePage({
       prop: 'phone',
     },
   ],
+  // data() {
+  //   return [
+  //     { name: '1', address: '11', phone: '33' },
+  //     { name: '2', address: '11', phone: '33' },
+  //     { name: '3', address: '11', phone: '33' },
+  //     { name: '4', address: '11', phone: '33' },
+  //     { name: '5', address: '11', phone: '33' },
+  //     { name: '6', address: '11', phone: '33' },
+  //     { name: '7', address: '11', phone: '33' },
+  //     { name: '8', address: '11', phone: '33' },
+  //     { name: '9', address: '11', phone: '33' },
+  //     { name: '10', address: '11', phone: '33' },
+  //     { name: '11', address: '11', phone: '33' },
+  //   ]
+  // },
+  // data: ref([
+  //   { name: '1', address: '11', phone: '33' },
+  //   { name: '2', address: '11', phone: '33' },
+  //   { name: '3', address: '11', phone: '33' },
+  //   { name: '4', address: '11', phone: '33' },
+  //   { name: '5', address: '11', phone: '33' },
+  //   { name: '6', address: '11', phone: '33' },
+  //   { name: '7', address: '11', phone: '33' },
+  //   { name: '8', address: '11', phone: '33' },
+  //   { name: '9', address: '11', phone: '33' },
+  //   { name: '10', address: '11', phone: '33' },
+  //   { name: '11', address: '11', phone: '33' },
+  // ]),
   fetch(params) {
-    console.log('params', params)
-    return Promise.resolve([
-      { name: '1', address: '11', phone: '33' },
-      { name: '2', address: '11', phone: '33' },
-      { name: '3', address: '11', phone: '33' },
-      { name: '4', address: '11', phone: '33' },
-      { name: '5', address: '11', phone: '33' },
-      { name: '6', address: '11', phone: '33' },
-      { name: '7', address: '11', phone: '33' },
-      { name: '8', address: '11', phone: '33' },
-      { name: '9', address: '11', phone: '33' },
-      { name: '10', address: '11', phone: '33' },
-      { name: '11', address: '11', phone: '33' },
-    ])
+    return Promise.resolve({
+      records: [
+        { name: '1', address: '11', phone: '33' },
+        { name: '2', address: '11', phone: '33' },
+        { name: '3', address: '11', phone: '33' },
+        { name: '4', address: '11', phone: '33' },
+        { name: '5', address: '11', phone: '33' },
+        { name: '6', address: '11', phone: '33' },
+        { name: '7', address: '11', phone: '33' },
+        { name: '8', address: '11', phone: '33' },
+        { name: '9', address: '11', phone: '33' },
+        { name: '10', address: '11', phone: '33' },
+        { name: '11', address: '11', phone: '33' },
+      ],
+      total: 11,
+    })
   },
-  nativePaging: true,
 })
 </script>
 

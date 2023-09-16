@@ -9,6 +9,7 @@ import type { ElPaginationProps } from '../../types'
 
 defineOptions({
   name: 'OpTablePage',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<{
@@ -16,6 +17,7 @@ const props = withDefaults(defineProps<{
   tableProps?: OpTableProps
   searchFormProps?: OpSearchFormProps
   paginationProps?: ElPaginationProps
+  loading?: boolean
 }>(), {
   tableProps: () => ({}),
   searchFormProps: () => ({}),
@@ -45,10 +47,16 @@ const showSearch = computed(() => {
       <slot name="actions" />
     </div>
     <div class="op-table-page-body">
-      <OpTable v-bind="tableProps" />
+      <OpTable v-loading="loading" v-bind="{ ...tableProps, ...$attrs }" />
     </div>
     <div v-if="paginationProps.total" class="op-table-page-paging">
       <ElPagination v-bind="paginationProps" />
     </div>
   </div>
 </template>
+
+<style lang="less">
+:root{
+
+}
+</style>
